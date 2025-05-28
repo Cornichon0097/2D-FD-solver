@@ -1,0 +1,25 @@
+# ---> Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+# ---> Python
+__pycache__
+venv
+
+# ---> Directories
+# Build
+obj
+bin
+
+#vtk files
+*.vti
+
+# Documentation
+doc
+
+# VS Code
+.vscode
