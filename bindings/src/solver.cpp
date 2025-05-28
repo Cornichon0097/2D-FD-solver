@@ -79,10 +79,8 @@ arma::mat Solver::i_part(void)
 */
 arma::mat Solver::padded(const arma::mat m)
 {
-    int n = m.n_cols;
-
-    arma::mat res(n + 2, n + 2, arma::fill::zeros);
-    res.submat(1, 1, n, n) = m;
+    arma::mat res(m.n_rows + 2, m.n_cols + 2, arma::fill::zeros);
+    res.submat(1, 1, m.n_rows, m.n_cols) = m;
 
     return res;
 }

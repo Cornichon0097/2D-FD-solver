@@ -3,7 +3,7 @@ from setuptools import setup, Extension
 extension_module = Extension('_solver',
       include_dirs = ['./include/armanpy/', 'src/'],
       libraries = ['m', 'z', 'armadillo'],
-      sources = ['solver.i', 'src/cuda_solver.cpp'],
+      sources = ['solver.i', 'src/solver.cpp'],
       swig_opts = ["-c++", "-Wall", "-I./include/armanpy/", "-I./src/",])
 
 setup(name = 'solver',
