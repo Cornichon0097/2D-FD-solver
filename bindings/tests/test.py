@@ -1,26 +1,14 @@
-import solver
 import numpy as np
+import pickle
 
-# numpyArray = np.array([[0.1, 0.2], [0.3, 0.4]], dtype = np.float64, order = 'F')
-# print("Initial object:")
-# print(numpyArray)
+import solver
 
-# mc = testmod3.Myclass(numpyArray)
-# print("Object in the C++ class (constructor with argument):")
-# print(mc.myMat)
+V0    = np.zeros((10,10), dtype=np.float64, order='F')
+rpart = np.zeros((10,10), dtype=np.float64, order='F')
+ipart = np.zeros((10,10), dtype=np.float64, order='F')
 
-# mc = testmod3.Myclass()
-# print("Object in the C++ class (empty constructor):")
-# print(mc.myMat)
+solv = solver.Solver(V0, rpart, ipart, "ftcs", 1.0, 1.0, 1.0)
 
-
-# a = mc.getEmptyArma(3)
-# a[0,1] = 1.0
-# print("Object returned by the C++ method getEmptyArma() and modified:")
-# print(a)
-
-# print("Object returned by the C++ method testArma() (transposition):")
-# print(mc.testArma(a))
-
-V0 = np.zeros((10,10), dtype=np.float64, order='F')
-mySolver = solver.Solver(V0)
+for i in range(1, 10):
+    solv.compute()
+    print({pickle.dumps(solv.r_part() + 1j * solv.i_part())})
