@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=66.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solver"
+version = "1.0"
+authors = [
+    {name="Antoni Blanche", email="antoni.blanche@proton.me"},
+    {name="Clément Marboeuf", email=" marboeuf.clement@gmail.com "},
+]
+description = "2D-FD solver"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/dubrayn/dubrayn.github.io"
+"Bug Tracker" = "https://github.com/dubrayn/dubrayn.github.io/issues"

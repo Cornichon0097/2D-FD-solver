@@ -1,87 +1,46 @@
 # ================================= Variables ================================ #
 # -------------------------------- directories ------------------------------- #
+SRCDIR   = src
 TESTSDIR = tests
-OBJDIR   = obj
-BINDIR   = bin
-
-# --------------------------------- Compiler --------------------------------- #
-CXX      = g++
-CXXFLAGS = -g -O2 -std=c++11 -Wall -Wextra -Werror
-
-# ---------------------------------- Linker ---------------------------------- #
-LD      = g++
-LDFLAGS = #-L$(ARMADILLODIR)
-
-# ----------------------------------- Files ---------------------------------- #
-TARGET = $(BINDIR)/test_solver.out
-
-OFILES = $(OBJDIR)/solver.o \
-         $(OBJDIR)/test_solver.o
 
 # ============================= Targets and rules ============================ #
 # ------------------------------ Default target ------------------------------ #
-all: $(TARGET) #bindings
+all: $(SRCDIR)/solver.cpp \
+     $(SRCDIR)/solver.h
+	python3 setup.py build
 
 .PHONY: all
 
-# ------------------------------ Python bindings ----------------------------- #
-bindings: solver.cpp \
-          solver.h
-	python3 setup.py build
+# ------------------------------- Install rule ------------------------------- #
+install: cuda
+	pip install .
 
-install: bindings
-	python3 setup.py install --user
+.PHONY: install
 
-test: install
-	python3 test.py
+# --------------------------------- Cuda rule -------------------------------- #
+cuda: all \
+      $(SRCDIR)/cuda_helper.cu \
+      $(SRCDIR)/cuda_helper.h
+	nvcc --compiler-options -fPIC -shared -g -O2 -I./include/armanpy/ -I./src/ -I/home/cornichon/Documents/projects/prsa/venv/include -I/usr/include/python3.11 -c src/cuda_helper.cu -o build/temp.linux-x86_64-cpython-311/src/cuda_helper.o
+	x86_64-linux-gnu-g++ -shared -Wl,-O1 -Wl,-Bsymbolic-functions -g -fwrapv -O2 build/temp.linux-x86_64-cpython-311/solver_wrap.o build/temp.linux-x86_64-cpython-311/src/cuda_solver.o build/temp.linux-x86_64-cpython-311/src/cuda_helper.o -L/usr/lib/x86_64-linux-gnu -lm -lz -larmadillo -L/usr/local/cuda-12.9/lib64 -lcudart -o build/lib.linux-x86_64-cpython-311/_solver.cpython-311-x86_64-linux-gnu.so
 
-.PHONY: bindings \
-        install \
-        test
+.PHONY: cuda
 
-# ----------------------------- Directories rules ---------------------------- #
-$(OBJDIR):
-	mkdir -p $@
-
-$(BINDIR):
-	mkdir -p $@
-
-# ------------------------------- Target rule -------------------------------- #
-$(TARGET): $(OFILES) \
-           $(BINDIR)
-	$(LD) $(LDFLAGS) -o $@ $(OFILES) -larmadillo
-
-$(OBJDIR)/solver.o: solver.cpp \
-                    solver.h \
-                    $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
-
-$(OBJDIR)/test_solver.o: $(TESTSDIR)/test_solver.cpp \
-                         $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
-
-$(TESTSDIR)/test_solver.cpp : $(TESTSDIR)/test_solver.h
-	cxxtestgen --error-printer -o $@ $<
-
-# -------------------------------- Main rules -------------------------------- #
+# -------------------------------- Style rule -------------------------------- #
 style:
-	astyle --project solver.cpp solver.h $(TESTSDIR)/test_solver.h
+	astyle --project $(SRCDIR)/*
 
-run: $(TARGET)
-	./$<
-
-.PHONY: style \
-        run
+.PHONY: style
 
 # -------------------------------- Clean rules ------------------------------- #
 clean:
-	rm -f $(TARGET) $(OFILES)
-
-distclean: clean
 	python3 setup.py clean --all
 
+distclean: clean
+	rm -rf solver.egg-info
+
 maintainer-clean: distclean
-	rm -f $(TESTSDIR)/test_solver.cpp solver.py solver_wrap.cpp
+	rm -f solver.py solver_wrap.cpp
 
 .PHONY: clean \
         distclean \
