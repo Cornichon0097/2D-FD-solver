@@ -9,7 +9,7 @@ authors = [
     {name="Antoni Blanche", email="antoni.blanche@proton.me"},
     {name="Clément Marboeuf", email=" marboeuf.clement@gmail.com "},
 ]
-description = "2D-FD solver"
+description = "2D-FD solver for the time-dependent non-relativistic Schrödinger equation"
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
