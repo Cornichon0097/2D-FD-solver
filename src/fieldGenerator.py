@@ -71,15 +71,15 @@ def init_states(config):
     return psi, v0
 
 
-def generate(config_file, db):
+def generate(param_file, db):
     """ Puts initial states in database.
 
     The generate() function generates and puts initial states in the database.
     If needed, the generate() function can return the latest result of a
     previous run to restart it.
 
-    @param config_file the configuration file,
-    @param db          the database.
+    @param param_file the parameters file,
+    @param db         the database.
 
     @return true if a previous run can be restarted, false otherwise.
     """
@@ -90,7 +90,7 @@ def generate(config_file, db):
             logging.warning("Checksum from previous run found")
             return document['checksum']
 
-    with open(config_file, "r") as read_file:
+    with open(param_file, "r") as read_file:
         solver = json.load(read_file)
 
     psi, v0 = init_states(solver)

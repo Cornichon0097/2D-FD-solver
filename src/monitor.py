@@ -22,7 +22,7 @@ from const import *
 def extract(data):
     """ Extracts data from a MongoDB document.
 
-    The extract() function extracts data frome a MongoDB document.
+    The extract() function extracts data from a MongoDB document.
 
     @param data the MongoDB document.
 
@@ -74,11 +74,12 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
     begin = time.time()
 
     while t <= T_MAX:
-        solv.calcul_psi_t_plus_dt()
+        solv.compute()
         t = t + dt
         count = count + 1
+
         if count >= span:
-            psi = solv.psi_real_part + 1j * solv.psi_imag_part
+            psi = solv.r_part() + 1j * solv.i_part()
             logging.debug("Norm: %f" % (np.linalg.norm(psi)))
             db.insert({"checksum": checksum, "v0": V0,
                        "psi": pickle.dumps(psi), "norm": np.linalg.norm(psi),
@@ -107,20 +108,20 @@ def connect_db(mongodb):
     return db
 
 
-def run(mongodb, config_file):
+def run(mongodb, param_file):
     """ Main monitor function.
 
     The run() function is the main function of the monitor.
 
-    @param mongodb     the MongoDB instance,
-    @param config_file the path to the config file.
+    @param mongodb    the MongoDB instance,
+    @param param_file the path to the parameters file.
     """
     print("Initialisation...")
 
     db = connect_db(mongodb)
     logging.debug("MongoDB initialised")
 
-    run_id = fieldGenerator.generate(config_file, db)
+    run_id = fieldGenerator.generate(param_file, db)
     logging.debug("Field initialised")
 
     document = db.retrieve()

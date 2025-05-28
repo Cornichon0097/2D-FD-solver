@@ -2,8 +2,8 @@
 
 Mandatory arguments to long options are mandatory for short options too.
 Input:
-      --settings=FILE    Settings input file [default: res/settings.json]
-      --config=FILE      Config input file [default: res/config.json]
+      --settings=FILE    Settings input file [default: config/settings.json]
+      --param=FILE       Parameters input file [default: config/param.json]
 
 Logger:
   -l, --level=LEVEL      Logger level (DEBUG, INFO, WARNING, ERROR)

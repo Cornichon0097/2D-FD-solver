@@ -90,13 +90,13 @@ def main():
     """
     OPTLIST      = "hl:o:F:D:H:u:p:d:c:"
     LONG_OPTLIST = [
-        "help", "settings=", "config=",
+        "help", "settings=", "param=",
         "level=", "output=", "format=", "datefmt=",
         "host=", "username=", "password=", "dbname=", "collection=",
     ]
 
-    settings_file = "res/settings.json"
-    config_file   = "res/config.json"
+    settings_file = "config/settings.json"
+    param_file    = "config/param.json"
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], OPTLIST, LONG_OPTLIST)
@@ -111,8 +111,8 @@ def main():
             sys.exit()
         elif opt == "--settings":
             settings_file = arg
-        elif opt == "--config":
-            config_file = arg
+        elif opt == "--param":
+            param_file = arg
 
     with open(settings_file, "r") as read_file:
         settings = json.load(read_file)
@@ -120,7 +120,7 @@ def main():
     set_logger(settings['logger'], opts)
     logging.debug("Logging initialised")
 
-    monitor.run(set_mongodb(settings['mongodb'], opts), config_file)
+    monitor.run(set_mongodb(settings['mongodb'], opts), param_file)
 
 
 if __name__ == "__main__":
