@@ -1,0 +1,19 @@
+2D-FD solver for the time-dependent non-relativistic Schrödinger equation.
+
+Mandatory arguments to long options are mandatory for short options too.
+Input:
+      --settings=FILE    Settings input file [default: res/settings.json]
+      --config=FILE      Config input file [default: res/config.json]
+
+Logger:
+  -l, --level=LEVEL      Logger level (DEBUG, INFO, WARNING, ERROR)
+  -o, --output=FILE      Logger output file
+  -F, --format=FORMAT    Logger output format
+  -D, --datefmt=FORMAT   Logger date format
+
+MongoDB:
+  -H, --host=HOST        MongoDB hostname
+  -u, --username=LOGIN   MongoDB user
+  -p, --password=PASSWD  MongoDB user password
+  -d, --dbname=NAME      MongoDB database
+  -c, --collection=NAME  MongoDB collection of the database

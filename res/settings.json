@@ -1,0 +1,18 @@
+{
+    "logger":
+    {
+        "level": "info",
+        "output": "/tmp/prsa.log",
+        "format": "%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S"
+    },
+
+    "mongodb":
+    {
+        "host": "127.0.0.1",
+        "username": "cornichon",
+        "password": "vinaigre",
+        "dbname": "prsa",
+        "collection": "dev"
+    }
+}

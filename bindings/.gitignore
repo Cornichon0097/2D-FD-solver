@@ -1,0 +1,13 @@
+# Python Bindings
+dist
+build
+__pycache__
+solver.egg-info
+solver_wrap.cpp
+solver.py
+
+# CXX tests
+obj
+bin
+tests/*.cpp
+cpp_test

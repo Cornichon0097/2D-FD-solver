@@ -1,0 +1,10 @@
+{
+    "scheme": "ftcs",
+    "span": 1000,
+
+    "wave": "gaussian",
+    "args": [0, 0, 2.06, "A", 0, 0],
+
+    "field": "potential_2D_HO",
+    "type": "fun"
+}
