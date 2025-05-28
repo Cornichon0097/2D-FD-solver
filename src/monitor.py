@@ -19,6 +19,22 @@ import solver
 from const import *
 
 
+def connect_db(mongodb):
+    """ Establish connection with MongoDB.
+
+    The connect_db() function establish connection with MongoDB.
+
+    @param mongodb the MongoDB instance.
+
+    @return the MongoDB connection.
+    """
+    db = MongoDBConnection(mongodb['host'], mongodb['username'],
+                           mongodb['password'], mongodb['dbname'])
+    db.use(mongodb['dbname'], mongodb['collection'])
+
+    return db
+
+
 def extract(data):
     """ Extracts data from a MongoDB document.
 
@@ -90,22 +106,6 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
 
     logging.info("Calculation terminated, time elapsed: %f" % (end - begin))
     logging.info("Norm: %f" % (np.linalg.norm(psi)))
-
-
-def connect_db(mongodb):
-    """ Establish connection with MongoDB.
-
-    The connect_db() function establish connection with MongoDB.
-
-    @param mongodb the MongoDB instance.
-
-    @return the MongoDB connection.
-    """
-    db = MongoDBConnection(mongodb['host'], mongodb['username'],
-                           mongodb['password'], mongodb['dbname'])
-    db.use(mongodb['dbname'], mongodb['collection'])
-
-    return db
 
 
 def run(mongodb, param_file):
