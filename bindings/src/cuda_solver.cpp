@@ -8,7 +8,7 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                std::string scheme, double _dx, double _dy, double _dt):
     scheme(scheme), dx(_dx), dy(_dy), dt(_dt)
 {
-    struct d_data h_d;
+    struct h_data h_d;
 
     h_bar = 1.0;
     m     = 1.0;
@@ -55,7 +55,7 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                double _dx, double _dy, double _dt):
     scheme(scheme), h_bar(_h_bar), m(_m), dx(_dx), dy(_dy), dt(_dt)
 {
-    struct d_data h_d;
+    struct h_data h_d;
 
     V0    = padded(_V0);
     rpart = padded(_rpart);
@@ -86,27 +86,20 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
 */
 void Solver::compute(void)
 {
+    struct h_data h_d = {.rpart = rpart.memptr(), .ipart = ipart.memptr()};
+
     execute_kernel(scheme.front());
+    retrieve_results(&h_d);
 }
 
 arma::mat Solver::r_part(void)
 {
-    struct d_data h_d;
-
-    retrieve_results(&h_d);
-    memcpy(rpart.memptr(), h_d.rpart, rpart.n_elem * sizeof(double));
-
-    return rpart;
+    return rpart.submat(1, 1, rpart.n_rows - 2, rpart.n_cols - 2);
 }
 
 arma::mat Solver::i_part(void)
 {
-    struct d_data h_d;
-
-    retrieve_results(&h_d);
-    memcpy(ipart.memptr(), h_d.ipart, ipart.n_elem * sizeof(double));
-
-    return ipart;
+    return ipart.submat(1, 1, ipart.n_rows - 2, ipart.n_cols - 2);
 }
 
 /**
@@ -117,10 +110,8 @@ arma::mat Solver::i_part(void)
 */
 arma::mat Solver::padded(const arma::mat m)
 {
-    int n = m.n_cols;
-
-    arma::mat res(n + 2, n + 2, arma::fill::zeros);
-    res.submat(1, 1, n, n) = m;
+    arma::mat res(m.n_rows + 2, m.n_cols + 2, arma::fill::zeros);
+    res.submat(1, 1, m.n_rows, m.n_cols) = m;
 
     return res;
 }

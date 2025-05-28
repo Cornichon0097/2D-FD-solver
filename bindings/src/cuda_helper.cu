@@ -9,38 +9,52 @@
 #define INBOUND(idx, ncols) ((idx % ncols > 0) && (idx % ncols < ncols - 1) \
                              && (idx > ncols) && (idx < ncols * (ncols - 1)))
 
+struct d_param {
+        size_t ncols;
+        double h_bar, m;
+        double dx, dy, dt;
+};
+
+struct d_data {
+        double *v0;
+        double *rpart, *ipart;
+        double *trpart, *tipart;
+        struct d_param *param;
+};
+
 struct d_data *d_data = NULL;
-
-double *d_rpart, *d_ipart;
-
-static size_t ncols = 0;
+size_t ncols;
 
 /**
  * \brief      { function_description }
  */
-__global__ void ftcs(double *drp, double *dip, struct d_data *const d)
+__global__ void ftcs(const double *const v0, const double *const rpart,
+                     const double *const ipart, double *const trpart,
+                     double *const tipart, const struct d_param *const p)
 {
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
+        int idx = blockDim.x * blockIdx.x + threadIdx.x;
 
-    double const_dx = d->h_bar / (2 * d->m * d->dx * d->dx);
-    double const_dy = d->h_bar / (2 * d->m * d->dy * d->dy);
-    double potentiel;
+        double const_dx = p->h_bar / (2 * p->m * p->dx * p->dx);
+        double const_dy = p->h_bar / (2 * p->m * p->dy * p->dy);
+        double potentiel;
 
-    if (INBOUND(idx, d->ncols)) {
-        potentiel = ((-1 / d->h_bar) * d->v0[idx])
-                    - 2 * const_dx - 2 * const_dy;
+        if (INBOUND(idx, p->ncols)) {
+                potentiel = ((-1 / p->h_bar) * v0[idx])
+                            - 2 * const_dx - 2 * const_dy;
 
-        drp[idx] = d->rpart[idx] - d->dt
-                * ((potentiel * d->ipart[idx])
-                + const_dx * (d->ipart[idx - d->ncols]
-                        + d->ipart[idx + d->ncols])
-                + const_dy * (d->ipart[idx - 1] + d->ipart[idx + 1]));
+                trpart[idx] = rpart[idx] - p->dt
+                              * ((potentiel * ipart[idx])
+                              + const_dx * (ipart[idx - p->ncols]
+                                            + ipart[idx + p->ncols])
+                              + const_dy * (ipart[idx - 1]
+                                            + ipart[idx + 1]));
 
-        dip[idx] = d->ipart[idx] + d->dt
-                * ((potentiel * d->rpart[idx])
-                + const_dx * (d->rpart[idx - d->ncols]
-                        + d->rpart[idx + d->ncols])
-                + const_dy * (d->rpart[idx - 1] + d->rpart[idx + 1]));
+                tipart[idx] = ipart[idx] + p->dt
+                              * ((potentiel * rpart[idx])
+                              + const_dx * (rpart[idx - p->ncols]
+                                            + rpart[idx + p->ncols])
+                              + const_dy * (rpart[idx - 1]
+                                            + rpart[idx + 1]));
     }
 }
 
@@ -51,9 +65,9 @@ __global__ void ftcs(double *drp, double *dip, struct d_data *const d)
  *
  * \return     { description_of_the_return_value }
  */
-__host__ int init_device_matrix(struct d_data *const th_data, const struct d_data *const h_data)
+__host__ int init_device_matrix(const struct h_data *const h_data)
 {
-        cudaError_t err = cudaMalloc(&d_rpart, MAT_SIZE(ncols));
+        cudaError_t err = cudaMalloc(&(d_data->v0), MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -61,7 +75,7 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
                 return -1;
         }
 
-        err = cudaMalloc(&d_ipart, MAT_SIZE(ncols));
+        err = cudaMalloc(&(d_data->rpart), MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -69,7 +83,7 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
                 return -1;
         }
 
-        err = cudaMalloc(&(th_data->v0), MAT_SIZE(ncols));
+        err = cudaMalloc(&(d_data->ipart), MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -77,7 +91,23 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
                 return -1;
         }
 
-        err = cudaMemcpy(th_data->v0, h_data->v0, MAT_SIZE(ncols),
+        err = cudaMalloc(&(d_data->trpart), MAT_SIZE(h_data->ncols));
+
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
+        err = cudaMalloc(&(d_data->tipart), MAT_SIZE(h_data->ncols));
+
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
+        err = cudaMemcpy(d_data->v0, h_data->v0, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -86,15 +116,7 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
                 return -1;
         }
 
-        err = cudaMalloc(&(th_data->rpart), MAT_SIZE(ncols));
-
-        if (err != cudaSuccess) {
-                fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
-                                "%s\n", cudaGetErrorString(err));
-                return -1;
-        }
-
-        err = cudaMemcpy(th_data->rpart, h_data->rpart, MAT_SIZE(ncols),
+        err = cudaMemcpy(d_data->rpart, h_data->rpart, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -103,15 +125,7 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
                 return -1;
         }
 
-        err = cudaMalloc(&(th_data->ipart), MAT_SIZE(ncols));
-
-        if (err != cudaSuccess) {
-                fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
-                                "%s\n", cudaGetErrorString(err));
-                return -1;
-        }
-
-        err = cudaMemcpy(th_data->ipart, h_data->ipart, MAT_SIZE(ncols),
+        err = cudaMemcpy(d_data->ipart, h_data->ipart, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -130,29 +144,43 @@ __host__ int init_device_matrix(struct d_data *const th_data, const struct d_dat
  *
  * \return     { description_of_the_return_value }
  */
-__host__ int init_device_memory(const struct d_data *const h_data)
+__host__ int init_device_memory(const struct h_data *const h_data)
 {
-        struct d_data tmp_h_data;
+        cudaError_t err;
 
-        if (ncols != 0) {
+        if (d_data != NULL) {
                 fprintf(stderr, "Device memory already initialized\n");
                 return -1;
         }
 
-        ncols = h_data->ncols;
+        d_data = (struct d_data *) malloc(sizeof(struct d_data));
 
-        if (init_device_matrix(&tmp_h_data, h_data) != 0)
+        if (d_data == NULL) {
+                perror("malloc()");
+                return -1;
+        }
+
+        if (init_device_matrix(h_data) != 0)
                 return -1;
 
-        tmp_h_data.ncols = h_data->ncols;
-        tmp_h_data.h_bar = h_data->h_bar;
-        tmp_h_data.m     = h_data->m;
-        tmp_h_data.dx    = h_data->dx;
-        tmp_h_data.dy    = h_data->dy;
-        tmp_h_data.dt    = h_data->dt;
+        err = cudaMalloc(&(d_data->param), sizeof(struct d_param));
 
-        cudaMalloc(&d_data, sizeof(struct d_data));
-        cudaMemcpy(d_data, &tmp_h_data, sizeof(struct d_data), cudaMemcpyHostToDevice);
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
+        cudaMemcpy(d_data->param, &(h_data->ncols), sizeof(struct d_param),
+                   cudaMemcpyHostToDevice);
+
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMemcpy(): failed to copy host memory: "
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
+        ncols = h_data->ncols;
 
         return 0;
 }
@@ -170,7 +198,9 @@ __host__ int execute_kernel(const char scheme)
 
         switch (scheme) {
         case 'f':
-                ftcs<<<1, ncols>>>(d_rpart, d_ipart, d_data);
+                ftcs<<<1, ncols>>>(d_data->v0, d_data->rpart, d_data->ipart,
+                                   d_data->trpart, d_data->tipart,
+                                   d_data->param);
                 break;
         default:
                 break;
@@ -186,6 +216,24 @@ __host__ int execute_kernel(const char scheme)
 
         cudaDeviceSynchronize();
 
+        err = cudaMemcpy(d_data->rpart, d_data->trpart, MAT_SIZE(ncols),
+                         cudaMemcpyDeviceToDevice);
+
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMemcpy(): failed to copy host memory: "
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
+        err = cudaMemcpy(d_data->ipart, d_data->tipart, MAT_SIZE(ncols),
+                         cudaMemcpyDeviceToDevice);
+
+        if (err != cudaSuccess) {
+                fprintf(stderr, "cudaMemcpy(): failed to copy host memory: "
+                                "%s\n", cudaGetErrorString(err));
+                return -1;
+        }
+
         return 0;
 }
 
@@ -196,9 +244,8 @@ __host__ int execute_kernel(const char scheme)
  *
  * \return     The results.
  */
-__host__ int retrieve_results(struct d_data *const res)
+__host__ int retrieve_results(struct h_data *const res)
 {
-        struct d_data tmp_h_data;
         cudaError_t err;
 
         if (res == NULL) {
@@ -206,10 +253,8 @@ __host__ int retrieve_results(struct d_data *const res)
                 return -1;
         }
 
-        cudaMemcpy(d_data, &tmp_h_data, sizeof(struct d_data), cudaMemcpyDeviceToHost);
-
-        err = cudaMemcpy(&(tmp_h_data.rpart), res->rpart, MAT_SIZE(ncols),
-                         cudaMemcpyDeviceToHost);
+        err = cudaMemcpy(res->rpart, d_data->rpart, MAT_SIZE(ncols),
+                   cudaMemcpyDeviceToHost);
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMemcpy(): failed to copy device memory: "
@@ -217,8 +262,8 @@ __host__ int retrieve_results(struct d_data *const res)
                 return -1;
         }
 
-        err = cudaMemcpy(&(tmp_h_data.ipart), res->ipart, MAT_SIZE(ncols),
-                         cudaMemcpyDeviceToHost);
+        err = cudaMemcpy(res->ipart, d_data->ipart, MAT_SIZE(ncols),
+                   cudaMemcpyDeviceToHost);
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMemcpy(): failed to copy device memory: "
