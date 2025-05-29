@@ -12,7 +12,7 @@
         "host": "127.0.0.1",
         "username": "cornichon",
         "password": "vinaigre",
-        "dbname": "prsa",
-        "collection": "dev"
+        "dbname": "2D-FD_solevr",
+        "collection": "ftcs"
     }
 }
