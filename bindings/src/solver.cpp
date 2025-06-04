@@ -1,15 +1,38 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "solver.h"
+#include "cuda_helper.h"
 
 Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                std::string scheme, double _dx, double _dy, double _dt):
     scheme(scheme), dx(_dx), dy(_dy), dt(_dt)
 {
+    struct h_data h_d;
+
     h_bar = 1.0;
     m     = 1.0;
 
     V0    = padded(_V0);
     rpart = padded(_rpart);
     ipart = padded(_ipart);
+
+    h_d.v0     = V0.memptr();
+    h_d.rpart  = rpart.memptr();
+    h_d.ipart  = ipart.memptr();
+    h_d. ncols = V0.n_cols;
+    h_d.h_bar  = h_bar;
+    h_d.m      = m;
+    h_d.dx     = dx;
+    h_d.dy     = dy;
+    h_d.dt     = dt;
+
+    init_device_memory(&h_d);
+
+    if (init_device_memory(&h_d) < 0) {
+        clean_up_device();
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -32,9 +55,26 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                double _dx, double _dy, double _dt):
     scheme(scheme), h_bar(_h_bar), m(_m), dx(_dx), dy(_dy), dt(_dt)
 {
+    struct h_data h_d;
+
     V0    = padded(_V0);
     rpart = padded(_rpart);
     ipart = padded(_ipart);
+
+    h_d.v0     = V0.memptr();
+    h_d.rpart  = rpart.memptr();
+    h_d.ipart  = ipart.memptr();
+    h_d. ncols = V0.n_cols;
+    h_d.h_bar  = h_bar;
+    h_d.m      = m;
+    h_d.dx     = dx;
+    h_d.dy     = dy;
+    h_d.dt     = dt;
+
+    if (init_device_memory(&h_d) < 0) {
+        clean_up_device();
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -46,19 +86,10 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
 */
 void Solver::compute(void)
 {
-    switch (scheme.front()) {
-    case 'f':
-        ftcs();
-        break;
-    case 'b':
-        btcs();
-        break;
-    case 'c':
-        ctcs();
-        break;
-    default:
-        break;
-    }
+    struct h_data h_d = {.rpart = rpart.memptr(), .ipart = ipart.memptr()};
+
+    execute_kernel(scheme.front());
+    retrieve_results(&h_d);
 }
 
 arma::mat Solver::r_part(void)
@@ -90,21 +121,7 @@ arma::mat Solver::padded(const arma::mat m)
 */
 void Solver::ftcs(void)
 {
-    double const_dx = h_bar / (2 * m * dx * dx);
-    double const_dy = h_bar / (2 * m * dy * dy);
-
-    arma::mat potentiel = ((-1 / h_bar) * V0) - 2 * const_dx - 2 * const_dy;
-
-    arma::mat nrpart = rpart - dt * ((potentiel % ipart) +
-        const_dx * (arma::shift(ipart, -1) + arma::shift(ipart, +1)) +
-        const_dy * (arma::shift(ipart, -1, 1) + arma::shift(ipart, +1, 1)));
-
-    arma::mat nipart = ipart + dt * ((potentiel % rpart) +
-        const_dx * (arma::shift(rpart, -1) + arma::shift(rpart, +1)) +
-        const_dy * (arma::shift(rpart, -1, 1) + arma::shift(rpart, +1, 1)));
-
-    rpart = nrpart;
-    ipart = nipart;
+    /* TODO */
 }
 
 void Solver::btcs(void)
