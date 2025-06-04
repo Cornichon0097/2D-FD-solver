@@ -19,5 +19,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/Cornichon0097/2D-FD-solver/tree/main/bindings"
-"Bug Tracker" = "https://github.com/Cornichon0097/2D-FD-solver/issues"
+"Homepage" = "https://github.com/dubrayn/dubrayn.github.io"
+"Bug Tracker" = "https://github.com/dubrayn/dubrayn.github.io/issues"
