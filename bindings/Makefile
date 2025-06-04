@@ -50,7 +50,7 @@ install: all
 # ------------------------------- Tests rules -------------------------------- #
 test: $(TESTSDIR)/test_cuda_solver.cu \
       $(SRCDIR)/cuda_helper.cu
-	$(NVCC) -I$(SRCDIR) -o $(BUILDDIR)/test_cuda_solver.out $^
+	$(NVCC) -I$(SRCDIR) -g -o $(BUILDDIR)/test_cuda_solver.out $^
 
 run: install
 	python3 tests/test_solver.py

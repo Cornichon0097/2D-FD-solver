@@ -3,7 +3,7 @@
 
 #include "cuda_helper.h"
 
-#define N_ELEM(n) (n * n)
+#define N_ELEM(n) ((n) * (n))
 #define MAT_SIZE(n) (N_ELEM(n) * sizeof(double))
 
 #define INBOUND(idx, ncols) ((idx % ncols > 0) && (idx % ncols < ncols - 1) \
@@ -15,15 +15,12 @@ struct d_param {
         double dx, dy, dt;
 };
 
-struct d_data {
-        double *v0;
-        double *rpart, *ipart;
-        double *trpart, *tipart;
-        struct d_param *param;
-};
+double *v0;
+double *rpart, *ipart;
+double *trpart, *tipart;
+struct d_param *param;
 
-struct d_data *d_data = NULL;
-size_t ncols;
+size_t ncols = 0;
 
 /**
  * \brief      { function_description }
@@ -67,7 +64,7 @@ __global__ void ftcs(const double *const v0, const double *const rpart,
  */
 __host__ int init_device_matrix(const struct h_data *const h_data)
 {
-        cudaError_t err = cudaMalloc(&(d_data->v0), MAT_SIZE(h_data->ncols));
+        cudaError_t err = cudaMalloc(&v0, MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -75,7 +72,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMalloc(&(d_data->rpart), MAT_SIZE(h_data->ncols));
+        err = cudaMalloc(&rpart, MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -83,7 +80,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMalloc(&(d_data->ipart), MAT_SIZE(h_data->ncols));
+        err = cudaMalloc(&ipart, MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -91,7 +88,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMalloc(&(d_data->trpart), MAT_SIZE(h_data->ncols));
+        err = cudaMalloc(&trpart, MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -99,7 +96,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMalloc(&(d_data->tipart), MAT_SIZE(h_data->ncols));
+        err = cudaMalloc(&tipart, MAT_SIZE(h_data->ncols));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -107,7 +104,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMemcpy(d_data->v0, h_data->v0, MAT_SIZE(h_data->ncols),
+        err = cudaMemcpy(v0, h_data->v0, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -116,7 +113,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMemcpy(d_data->rpart, h_data->rpart, MAT_SIZE(h_data->ncols),
+        err = cudaMemcpy(rpart, h_data->rpart, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -125,7 +122,7 @@ __host__ int init_device_matrix(const struct h_data *const h_data)
                 return -1;
         }
 
-        err = cudaMemcpy(d_data->ipart, h_data->ipart, MAT_SIZE(h_data->ncols),
+        err = cudaMemcpy(ipart, h_data->ipart, MAT_SIZE(h_data->ncols),
                          cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -148,22 +145,15 @@ __host__ int init_device_memory(const struct h_data *const h_data)
 {
         cudaError_t err;
 
-        if (d_data != NULL) {
+        if (ncols != 0) {
                 fprintf(stderr, "Device memory already initialized\n");
-                return -1;
-        }
-
-        d_data = (struct d_data *) malloc(sizeof(struct d_data));
-
-        if (d_data == NULL) {
-                perror("malloc()");
                 return -1;
         }
 
         if (init_device_matrix(h_data) != 0)
                 return -1;
 
-        err = cudaMalloc(&(d_data->param), sizeof(struct d_param));
+        err = cudaMalloc(&param, sizeof(struct d_param));
 
         if (err != cudaSuccess) {
                 fprintf(stderr, "cudaMalloc(): failed to allocate memory:"
@@ -171,7 +161,7 @@ __host__ int init_device_memory(const struct h_data *const h_data)
                 return -1;
         }
 
-        cudaMemcpy(d_data->param, &(h_data->ncols), sizeof(struct d_param),
+        cudaMemcpy(param, &(h_data->ncols), sizeof(struct d_param),
                    cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -198,9 +188,7 @@ __host__ int execute_kernel(const char scheme)
 
         switch (scheme) {
         case 'f':
-                ftcs<<<1, ncols>>>(d_data->v0, d_data->rpart, d_data->ipart,
-                                   d_data->trpart, d_data->tipart,
-                                   d_data->param);
+                ftcs<<<ncols, ncols>>>(v0, rpart, ipart, trpart, tipart, param);
                 break;
         default:
                 break;
@@ -216,7 +204,7 @@ __host__ int execute_kernel(const char scheme)
 
         cudaDeviceSynchronize();
 
-        err = cudaMemcpy(d_data->rpart, d_data->trpart, MAT_SIZE(ncols),
+        err = cudaMemcpy(rpart, trpart, MAT_SIZE(ncols),
                          cudaMemcpyDeviceToDevice);
 
         if (err != cudaSuccess) {
@@ -225,7 +213,7 @@ __host__ int execute_kernel(const char scheme)
                 return -1;
         }
 
-        err = cudaMemcpy(d_data->ipart, d_data->tipart, MAT_SIZE(ncols),
+        err = cudaMemcpy(ipart, tipart, MAT_SIZE(ncols),
                          cudaMemcpyDeviceToDevice);
 
         if (err != cudaSuccess) {
@@ -253,7 +241,7 @@ __host__ int retrieve_results(struct h_data *const res)
                 return -1;
         }
 
-        err = cudaMemcpy(res->rpart, d_data->rpart, MAT_SIZE(ncols),
+        err = cudaMemcpy(res->rpart, rpart, MAT_SIZE(ncols),
                    cudaMemcpyDeviceToHost);
 
         if (err != cudaSuccess) {
@@ -262,7 +250,7 @@ __host__ int retrieve_results(struct h_data *const res)
                 return -1;
         }
 
-        err = cudaMemcpy(res->ipart, d_data->ipart, MAT_SIZE(ncols),
+        err = cudaMemcpy(res->ipart, ipart, MAT_SIZE(ncols),
                    cudaMemcpyDeviceToHost);
 
         if (err != cudaSuccess) {
