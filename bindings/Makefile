@@ -11,22 +11,13 @@ all: $(SRCDIR)/solver.cpp \
 
 .PHONY: all
 
-# --------------------------------- Cuda rule -------------------------------- #
-cuda: $(SRCDIR)/cuda_solver.cpp \
-      $(SRCDIR)/solver.h \
-      $(SRCDIR)/cuda_helper.cu \
-      $(SRCDIR)/cuda_helper.h
-	./scripts/setup_cuda.sh
-
-.PHONY: cuda
-
 # ------------------------------- Install rule ------------------------------- #
 install: all
 	pip install .
 
 .PHONY: install
 
-# ------------------------------- Install rule ------------------------------- #
+# -------------------------------- Tests rule -------------------------------- #
 run: install
 	python3 tests/test_solver.py
 
