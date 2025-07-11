@@ -23,13 +23,13 @@ doc:
 
 # -------------------------------- Clean rules ------------------------------- #
 clean:
-	$(MAKE) -C $(BINDDIR) clean
+	$(MAKE) -C $(BDGDIR) clean
 
 distclean:
-	$(MAKE) -C $(BINDDIR) distclean
+	$(MAKE) -C $(BDGDIR) distclean
 
 maintainer-clean:
-	$(MAKE) -C $(BINDDIR) maintainer-clean
+	$(MAKE) -C $(BDGDIR) maintainer-clean
 	rm -rf $(DOCDIR)
 
 .PHONY: clean \
