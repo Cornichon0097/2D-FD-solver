@@ -7,25 +7,20 @@
 %include "std_vectora.i"
 %include "exception.i"
 
-namespace std
-{
+namespace std {
   %template(map_string_int) map<string, int>;
   %template(map_string_double) map<string, double>;
   %template(map_string_string) map<string, string>;
 }
 
-%exception
-{
+%exception {
   try {
     $action
-  }
-  catch (const std::runtime_error& e) {
+  } catch (const std::runtime_error& e) {
     SWIG_exception(SWIG_RuntimeError, e.what());
-  }
-  catch (const std::logic_error& e) {
+  } catch (const std::logic_error& e) {
     SWIG_exception(SWIG_IndexError, e.what());
-  }
-  catch (const std::string s) {
+  } catch (const std::string s) {
     SWIG_exception(SWIG_RuntimeError, s.c_str());
   }
 }

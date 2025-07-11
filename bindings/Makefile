@@ -1,7 +1,7 @@
 # ================================= Variables ================================ #
 # -------------------------------- directories ------------------------------- #
 SRCDIR   = src
-TESTSDIR = tests
+TESTDIR = test
 
 # ============================= Targets and rules ============================ #
 # ------------------------------ Default target ------------------------------ #
@@ -18,10 +18,10 @@ install: all
 .PHONY: install
 
 # -------------------------------- Tests rule -------------------------------- #
-run: install
-	python3 tests/test_solver.py
+test: install
+	python3 ${TESTDIR}/test_solver.py
 
-.PHONY: run
+.PHONY: test
 
 # -------------------------------- Style rule -------------------------------- #
 style:

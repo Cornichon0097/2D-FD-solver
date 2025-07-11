@@ -1,26 +1,17 @@
 # ================================= Variables ================================ #
 # ---------------------------- Sources directories --------------------------- #
-SRCDIR   = src
-TESTSDIR = tests
-BINDDIR  = bindings
-DOCDIR   = doc
+SRCDIR = src
+BDGDIR = bindings
+DOCDIR = doc
 
 # ============================= Targets and rules ============================ #
 # ------------------------------ Default target ------------------------------ #
-all: vti
-	$(MAKE) -C $(BINDDIR) install
+all:
+	$(MAKE) -C $(BDGDIR) install
 
 .PHONY: all
 
-# ------------------------------- Tests rules -------------------------------- #
-test:
-	python3 tests/test_mongoDBConnection.py
-
-.PHONY: test
 # -------------------------------- Main rules -------------------------------- #
-vti:
-	mkdir -p $@
-
 run: all
 	python3 $(SRCDIR)/start.py
 
@@ -34,10 +25,10 @@ doc:
 clean:
 	$(MAKE) -C $(BINDDIR) clean
 
-distclean: clean
+distclean:
 	$(MAKE) -C $(BINDDIR) distclean
 
-maintainer-clean: distclean
+maintainer-clean:
 	$(MAKE) -C $(BINDDIR) maintainer-clean
 	rm -rf $(DOCDIR)
 
