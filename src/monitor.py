@@ -155,4 +155,5 @@ def run(mongodb, param_file):
         postProcessor.generate_vti(data[1], data[3], data[4], count)
         count = count + 1
 
+    print("Done.")
     db.insert({"checksum": None})
