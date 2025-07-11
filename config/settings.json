@@ -12,7 +12,7 @@
         "host": "127.0.0.1",
         "username": "cornichon",
         "password": "vinaigre",
-        "dbname": "2D-FD_solevr",
+        "dbname": "2D-FD_solver",
         "collection": "ftcs"
     }
 }
