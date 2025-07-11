@@ -1,14 +1,12 @@
 {
-    "logger":
-    {
+    "logger": {
         "level": "info",
         "output": "/tmp/prsa.log",
         "format": "%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s",
         "datefmt": "%Y-%m-%d %H:%M:%S"
     },
 
-    "mongodb":
-    {
+    "mongodb": {
         "host": "127.0.0.1",
         "username": "cornichon",
         "password": "vinaigre",
@@ -16,5 +14,7 @@
         "collection": "ftcs"
     },
 
-    "output": "vti"
+    "vtk": {
+        "output": "vti"
+    }
 }

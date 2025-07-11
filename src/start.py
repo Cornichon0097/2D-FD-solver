@@ -111,7 +111,7 @@ def main():
     logging.debug("Logging initialised")
 
     monitor.run(set_mongodb(settings['mongodb'], opts), param_file,
-                            settings['output'])
+                            settings['vtk']['output'])
 
 
 if __name__ == "__main__":
