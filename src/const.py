@@ -1,3 +1,6 @@
+""" @package const.py
+Provides global constants for the solver.
+"""
 import numpy as np
 
 # Those global constants will be used directly by the solver.
@@ -17,9 +20,8 @@ DT_FTCS = 0.02 / 800
 DT_BTCS = 0.02 / 40
 DT_CTCS = 0.02 / 4
 
-# Those specific constants are available parameters for the wave function in the
-# configuration file. Use the name of a constant instead of a numeric value in
-# the JSON file to use a specific value (example: 1 / sqrt(2 * pi)).
+# Those specific constants are special values for the wave function available by
+# there name in the configuration file (e.g. 1 / sqrt(2 * pi)).
 CONSTANTS = {
     # "NAME": VALUE,
     "A": 1 / np.sqrt(2 * np.pi),

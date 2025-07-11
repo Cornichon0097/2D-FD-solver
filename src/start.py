@@ -10,16 +10,12 @@ import monitor
 
 def usage():
     """ Prints usage.
-
-    The usage() function prints how to use the program.
     """
     print("Usage: %s [-h | --help] [OPTION]..." % (sys.argv[0]))
 
 
 def print_help():
     """ Prints detailled help.
-
-    The print_help() function prints a detailled help about the program.
     """
     usage()
 
@@ -32,8 +28,6 @@ def print_help():
 
 def set_logger(logger, opts):
     """ Set the logger.
-
-    The set_logger() function set the logger.
 
     @param logger the logger data,
     @param opts   the options to set the logger.
@@ -61,8 +55,6 @@ def set_logger(logger, opts):
 def set_mongodb(mongodb, opts):
     """ Set the MongoDB
 
-    The set_mongodb() function set the MongoDB.
-
     @param mongodb the MongoDB data,
     @param opts    the options to set the MongoDB.
 
@@ -85,8 +77,6 @@ def set_mongodb(mongodb, opts):
 
 def main():
     """ Main function.
-
-    The main() function is the first funnction called in the program.
     """
     OPTLIST      = "hl:o:F:D:H:u:p:d:c:"
     LONG_OPTLIST = [

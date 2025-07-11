@@ -1,10 +1,9 @@
 """ @package fieldGenerator
 Provides the field generator for the solver.
 
-The fieldGenerator package set initial states and field for the solver. If the
+The fieldGenerator package sets initial states and field for the solver. If the
 previous run has been interrupted, then the field generator will reload it.
 """
-
 import json
 import bson
 import pickle
@@ -28,8 +27,6 @@ import waves
 def hash_content(content):
     """ Returns a human readable hash.
 
-    The hash_content() function a human readable hash.
-
     @param content the hashed content.
 
     @return content as a human readable hash.
@@ -42,9 +39,9 @@ def hash_content(content):
 
 
 def init_states(config):
-    """ Initialise psi and V0
+    """ Initializes psi and V0
 
-    The init_states() function initialise psi and V0 With \a config paramèters.
+    The init_states() function returns psi and V0 initialized with \a config.
 
     @param config the initial configuration.
 
@@ -74,9 +71,10 @@ def init_states(config):
 def generate(param_file, db):
     """ Puts initial states in database.
 
-    The generate() function generates and puts initial states in the database.
-    If needed, the generate() function can return the latest result of a
-    previous run to restart it.
+    The generate() function generates initial states defined in \a param_file
+    and puts it in \a db. If a previous run was interrupted and parameters match
+    with \a param_file, then this function retuns the latest result found in
+    \a db instead.
 
     @param param_file the parameters file,
     @param db         the database.

@@ -1,10 +1,13 @@
+""" @package waves.py
+Provides wave functions for the solver.
+"""
 import numpy as np
 
 from const import *
 
 
 def gaussian(x0, y0, w, A, kx, ky):
-    """ Gaussian wave function
+    """ Gaussian wave function.
     """
     X = np.linspace(X_MIN, X_MAX, N_X)
     Y = np.linspace(Y_MIN, Y_MAX, N_Y)

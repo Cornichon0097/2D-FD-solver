@@ -1,3 +1,8 @@
+""" @package monitor.py
+Provides a monitor for the solver.
+
+The monitor is in charge to run the solver and make sure no problem occurs.
+"""
 import sys
 
 import bson
@@ -20,9 +25,7 @@ from const import *
 
 
 def connect_db(mongodb):
-    """ Establish connection with MongoDB.
-
-    The connect_db() function establish connection with MongoDB.
+    """ Creates connection with MongoDB.
 
     @param mongodb the MongoDB instance.
 
@@ -37,8 +40,6 @@ def connect_db(mongodb):
 
 def extract(data):
     """ Extracts data from a MongoDB document.
-
-    The extract() function extracts data from a MongoDB document.
 
     @param data the MongoDB document.
 
@@ -60,7 +61,7 @@ def extract(data):
 def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
     """ Runs the solver.
 
-    The compute() function runs the solver and saves results in a database.
+    The compute() function runs the solver and saves results in \a db.
 
     @param db       the database connection,
     @param checksum the run checksum,
@@ -109,9 +110,7 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
 
 
 def run(mongodb, param_file):
-    """ Main monitor function.
-
-    The run() function is the main function of the monitor.
+    """ Monitor main function.
 
     @param mongodb    the MongoDB instance,
     @param param_file the path to the parameters file.

@@ -1,10 +1,9 @@
 """ @package MongoDBConnection
-Provides an interface with MongoDB.
+Provides a MongoDB client interface.
 
 The MongoDBconnection is an interface that provides simple utilities to
 interact with a MongoDB database.
 """
-
 from pymongo import MongoClient
 import pymongo.errors
 
@@ -27,14 +26,14 @@ class MongoDBConnection:
     """ The MongoDB client database. """
     db = None
 
-    """ The MongoDB collection of the database. """
+    """ The MongoDB client collection. """
     collection = None
 
 
     def __init__(self, host, username, password, dbname):
-        """ Class constructor.
+        """ MongoDBConnection constructor.
 
-        The class constructor initialises the connection to the MongoDB server.
+        The MongDBConnection constructor creates a connection to MongoDB.
 
         @param self     the object pointer,
         @param host     the MongoDB host,
@@ -71,8 +70,8 @@ class MongoDBConnection:
     def insert(self, data):
         """ Insterts a new document.
 
-        The insert() method inserts the new document \a data in the collection
-        sets by the use() method.
+        The insert() method inserts the new document \a data in the curent
+        collection set by the use() method.
 
         @see use()
 
@@ -96,10 +95,10 @@ class MongoDBConnection:
     def retrieve(self, data = None):
         """ Retrieves a document.
 
-        The retrieve() method retrieves one document that match parameters
-        \a data in the collection set by the use() method.
-        If no data is specified, then the retrieve() method returns the last
-        insterted documment.
+        The retrieve() method retrieves one document that matchs \a data filter
+        in the current collection set by the use() method. If no filter is
+        specified, then the retrieve() method returns the last insterted
+        documment in the database.
 
         @see use()
 
@@ -128,10 +127,10 @@ class MongoDBConnection:
 
 
     def retrieve_all(self, data = None):
-        """ Retrieves all documents in the collection.
+        """ Retrieves all documents.
 
-        The retrieve_all() methode retrieves all documents in the collection set
-        by the use() method.
+        The retrieve_all() methode retrieves all documents in the current
+        collection set by the use() method.
 
         @see use()
 
