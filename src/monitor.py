@@ -52,13 +52,14 @@ def extract(data):
         np.asfortranarray(np.real(pickle.loads(data['psi']))),
         np.asfortranarray(np.imag(pickle.loads(data['psi']))),
         data['scheme'],
+        data['t'],
         data['span'],
     ]
 
     return res
 
 
-def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
+def compute(db, checksum, v0, psi, r_part, i_part, scheme, t, span):
     """ Runs the solver.
 
     The compute() function runs the solver and saves results in \a db.
@@ -70,6 +71,7 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
     @param r_part   real part of psi,
     @param i_part   imaginary part of psi,
     @param scheme   the scheme,
+    @param t        the current execution time,
     @param span     the span between insert in database.
     """
     if scheme == "ftcs":
@@ -84,7 +86,6 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
 
     logging.info("Norm: %f" % (np.linalg.norm(psi)))
 
-    t     = 0
     count = 0
     V0    = pickle.dumps(v0)
 
@@ -100,7 +101,7 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
             logging.debug("Norm: %f" % (np.linalg.norm(psi)))
             db.insert({"checksum": checksum, "v0": V0,
                        "psi": pickle.dumps(psi), "norm": np.linalg.norm(psi),
-                       "scheme": scheme, "span": span})
+                       "scheme": scheme, "t": t, "span": span})
             count = 0
 
     end = time.time()
@@ -129,11 +130,11 @@ def run(mongodb, param_file, output):
     if run_id == None:
         postProcessor.generate_init_vti(data[1], data[3], data[4], output)
 
-        print("Initial VTK generated in vti/")
+        print("Initial VTK generated in %s" % output)
         c = input("Continue? [Y/n] ")
 
         if c != "Y":
-            print("Aborting")
+            print("Calculation aborted.")
             db.insert({"checksum": None})
             sys.exit(0)
     else:

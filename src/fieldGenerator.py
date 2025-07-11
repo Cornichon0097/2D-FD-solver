@@ -85,7 +85,7 @@ def generate(param_file, db):
 
     if document != None:
         if document['checksum'] != None:
-            logging.warning("Checksum from previous run found")
+            logging.info("Checksum from previous run found")
             return document['checksum']
 
     with open(param_file, "r") as read_file:
@@ -99,5 +99,5 @@ def generate(param_file, db):
     db.insert({"checksum": hash_content(checksum),
                "v0": bson.binary.Binary(pickle.dumps(v0, protocol = 2)),
                "psi": pickle.dumps(psi), "norm": np.linalg.norm(psi),
-               "scheme": solver['scheme'], "span": solver['span']})
+               "scheme": solver['scheme'], "t": 0, "span": solver['span']})
     logging.info("Initiale states inserted in the DB")
