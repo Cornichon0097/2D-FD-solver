@@ -21,7 +21,7 @@ DT_BTCS = 0.02 / 40
 DT_CTCS = 0.02 / 4
 
 # Those specific constants are special values for the wave function available by
-# there name in the configuration file (e.g. 1 / sqrt(2 * pi)).
+# there name in the configuration file (e.g., 1 / sqrt(2 * pi)).
 CONSTANTS = {
     # "NAME": VALUE,
     "A": 1 / np.sqrt(2 * np.pi),
