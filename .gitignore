@@ -11,15 +11,9 @@ __pycache__
 venv
 
 # ---> Directories
-# Build
 obj
 bin
-
-#vtk files
-*.vti
-
-# Documentation
 doc
 
-# VS Code
-.vscode
+# ---> VTK files
+*.vti

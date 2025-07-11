@@ -14,5 +14,7 @@
         "password": "vinaigre",
         "dbname": "2D-FD_solver",
         "collection": "ftcs"
-    }
+    },
+
+    "output": "vti"
 }

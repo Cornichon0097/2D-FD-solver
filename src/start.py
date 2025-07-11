@@ -110,7 +110,8 @@ def main():
     set_logger(settings['logger'], opts)
     logging.debug("Logging initialised")
 
-    monitor.run(set_mongodb(settings['mongodb'], opts), param_file)
+    monitor.run(set_mongodb(settings['mongodb'], opts), param_file,
+                            settings['output'])
 
 
 if __name__ == "__main__":

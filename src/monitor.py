@@ -109,7 +109,7 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
     logging.info("Norm: %f" % (np.linalg.norm(psi)))
 
 
-def run(mongodb, param_file):
+def run(mongodb, param_file, output):
     """ Monitor main function.
 
     @param mongodb    the MongoDB instance,
@@ -127,7 +127,7 @@ def run(mongodb, param_file):
     data     = extract(document)
 
     if run_id == None:
-        postProcessor.generate_init_vti(data[1], data[3], data[4])
+        postProcessor.generate_init_vti(data[1], data[3], data[4], output)
 
         print("Initial VTK generated in vti/")
         c = input("Continue? [Y/n] ")
@@ -152,7 +152,7 @@ def run(mongodb, param_file):
 
     for i in db.retrieve_all({"checksum": document['checksum']}):
         data = extract(i)
-        postProcessor.generate_vti(data[1], data[3], data[4], count)
+        postProcessor.generate_vti(data[1], data[3], data[4], count, output)
         count = count + 1
 
     print("Done.")

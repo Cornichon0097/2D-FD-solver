@@ -24,22 +24,25 @@ def generate_vtk(v0, psi_real_part, psi_imag_part, file_name):
     })
 
 
-def generate_init_vti(v0, psi_real_part, psi_imag_part):
+def generate_init_vti(v0, psi_real_part, psi_imag_part, output):
     """ Generates VTI file for the initial state.
 
     @param V0            the potential field,
     @param psi_real_part the real part of the psi function,
-    @param psi_imag_part the imaginary part of the psi function.
+    @param psi_imag_part the imaginary part of the psi function,
+    @param output        the output directory.
     """
-    generate_vtk(v0, psi_real_part, psi_imag_part, "vti/initial_state")
+    generate_vtk(v0, psi_real_part, psi_imag_part, output + "/initial_state")
 
 
-def generate_vti(v0, psi_imag_part, psi_real_part, id):
-    """ Generates VTI for any state
+def generate_vti(v0, psi_imag_part, psi_real_part, id, output):
+    """ Generates VTI for any state.
 
     @param V0            the potential field,
     @param psi_real_part the real part of the psi function,
     @param psi_imag_part the imaginary part of the psi function,
-    @param id            the state ID.
+    @param id            the state ID,
+    @param output        the output directory.
     """
-    generate_vtk(v0, psi_real_part, psi_imag_part, "vti/output_vti__%04d" % (id))
+    generate_vtk(v0, psi_real_part, psi_imag_part,
+                 output + "/output_vti__%04d" % (id))
