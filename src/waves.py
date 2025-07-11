@@ -8,6 +8,13 @@ from const import *
 
 def gaussian(x0, y0, w, A, kx, ky):
     """ Gaussian wave function.
+
+    @param x0 the initial x position,
+    @param y0 the initial y position,
+    @param w  the width of the gaussian,
+    @param A  the normalization constant,
+    @param kx the initial x speed,
+    @param ky the initial y speed.
     """
     X = np.linspace(X_MIN, X_MAX, N_X)
     Y = np.linspace(Y_MIN, Y_MAX, N_Y)

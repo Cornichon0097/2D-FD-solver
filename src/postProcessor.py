@@ -9,7 +9,7 @@ from pyevtk.hl import imageToVTK
 def generate_vtk(v0, psi_real_part, psi_imag_part, file_name):
     """ Generates VTK file.
 
-    @param V0            the field potential,
+    @param V0            the potential field,
     @param psi_real_part the real part of the psi function,
     @param psi_imag_part the imaginary part of the psi function,
     @param file_name     the output filename.
@@ -27,7 +27,7 @@ def generate_vtk(v0, psi_real_part, psi_imag_part, file_name):
 def generate_init_vti(v0, psi_real_part, psi_imag_part):
     """ Generates VTI file for the initial state.
 
-    @param V0            the field potential,
+    @param V0            the potential field,
     @param psi_real_part the real part of the psi function,
     @param psi_imag_part the imaginary part of the psi function.
     """
@@ -37,7 +37,7 @@ def generate_init_vti(v0, psi_real_part, psi_imag_part):
 def generate_vti(v0, psi_imag_part, psi_real_part, id):
     """ Generates VTI for any state
 
-    @param V0            the field potential,
+    @param V0            the potential field,
     @param psi_real_part the real part of the psi function,
     @param psi_imag_part the imaginary part of the psi function,
     @param id            the state ID.

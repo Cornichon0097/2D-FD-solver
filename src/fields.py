@@ -1,5 +1,5 @@
 """ @package fields.py
-Provides field potential generating functinos for the solver.
+Provides potential field generating functinos for the solver.
 """
 import numpy as np
 
@@ -7,9 +7,9 @@ from const import *
 
 
 def youngs_slits():
-    """ Returns the field potential for the young's slits simulation.
+    """ Returns the potential field for the young's slits simulation.
 
-    @return the initial field potential
+    @return the initial potential field
     """
     v0 = np.zeros((N_X, N_Y), dtype = np.float64)
 
@@ -28,9 +28,9 @@ def youngs_slits():
 
 
 def barrier():
-    """ Returns the field potential for the barrier simulation.
+    """ Returns the potential field for the barrier simulation.
 
-    @return the initial field potential
+    @return the initial potential field
     """
     v0 = np.zeros((N_X, N_Y), dtype = np.float64)
 
@@ -43,9 +43,9 @@ def barrier():
 
 
 def potential_2D_HO():
-    """ Returns the field potential for the 2D H0 simulation.
+    """ Returns the potential field for the 2D H0 simulation.
 
-    @return the initial field potential
+    @return the initial potential field
     """
     X = np.linspace(X_MIN, X_MAX, N_X)
     Y = np.linspace(Y_MIN, Y_MAX, N_Y)

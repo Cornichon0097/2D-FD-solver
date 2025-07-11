@@ -68,7 +68,7 @@ def compute(db, checksum, v0, psi, r_part, i_part, scheme, span):
     @param v0       the initial field,
     @param psi      psi
     @param r_part   real part of psi,
-    @param i_part   imaginair part of psi,
+    @param i_part   imaginary part of psi,
     @param scheme   the scheme,
     @param span     the span between insert in database.
     """

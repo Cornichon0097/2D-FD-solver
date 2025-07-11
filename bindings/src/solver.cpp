@@ -1,5 +1,22 @@
+/**
+ * \file       solver.cpp
+ */
 #include "solver.h"
 
+/**
+ * \brief      Solevr constructor.
+ *
+ * Creates a new solver with the Planck constant and the particle masse set to
+ * default value (1.0).
+ *
+ * \param      _V0     The potentiel field
+ * \param      _rpart  The real part
+ * \param      _ipart  The imaginary part
+ * \param[in]  scheme  The scheme
+ * \param[in]  _dx     The x speed
+ * \param[in]  _dy     The y speed
+ * \param[in]  _dt     The delta time
+ */
 Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                std::string scheme, double _dx, double _dy, double _dt):
     scheme(scheme), dx(_dx), dy(_dy), dt(_dt)
@@ -13,20 +30,18 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
 }
 
 /**
- * Initialiseur de la classe solver
- * On y prend l'état initial de la simulation, donc le champ de potentiel et psi à l'instant 0
- * les autres arguments sont des paramètres ou des matrices que nous initialisons une fois pour les utiliser dans les calculs de phi de t+dt
+ * \brief      Solevr constructor.
  *
- * @param V0 la matrice du champ de potentiel
- * @param _psi0_real_part psi à l'instant 0, partie réelle
- * @param _psi0_imag_part psi à l'instant 0, partie imaginaire
- * @param h_bar la constante de plank réduite
- * @param m la masse de la particule
- * @param scheme charactère donnant par quelle scheme on souhaite calculer (f pour FTCS, b pour BTCS, c pour CTCS)
- * @param dx pas d'espace sur l'axe x
- * @param dy pas d'espace sur l'axe y
- * @param dt pas de temps
-*/
+ * \param      _V0     The potentiel field
+ * \param      _rpart  The real part
+ * \param      _ipart  The imaginary part
+ * \param[in]  _h_bar  The Planck constant
+ * \param[in]  _m      The particle masse
+ * \param[in]  scheme  The scheme
+ * \param[in]  _dx     The x speed
+ * \param[in]  _dy     The y speed
+ * \param[in]  _dt     The delta time
+ */
 Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
                double _h_bar, double _m, std::string scheme,
                double _dx, double _dy, double _dt):
@@ -38,12 +53,11 @@ Solver::Solver(arma::mat &_V0, arma::mat &_rpart, arma::mat &_ipart,
 }
 
 /**
- * Calcul la valeur de psi(t+dt)
- * fait appel à une fonction auxiliaire en fonction de la méthode de calcul choisie
+ * \brief      Compute the next psi value.
  *
- * les méthodes implémentées sont FTCS (Forward), BTCS (Backward), CTCS (Crank-Nicolson)
- *
-*/
+ * Calls the right function depending on the scheme to compute the next value of
+ * psi.
+ */
 void Solver::compute(void)
 {
     switch (scheme.front()) {
@@ -61,22 +75,33 @@ void Solver::compute(void)
     }
 }
 
+/**
+ * \brief      Returns the real part.
+ *
+ * \return     The current real part.
+ */
 arma::mat Solver::r_part(void)
 {
     return rpart.submat(1, 1, rpart.n_rows - 2, rpart.n_cols - 2);
 }
 
+/**
+ * \brief      Returns the imaginary part.
+ *
+ * \return     The current imaginary part.
+ */
 arma::mat Solver::i_part(void)
 {
     return ipart.submat(1, 1, ipart.n_rows - 2, ipart.n_cols - 2);
 }
 
 /**
- * ajoute un "contour" de zeros sur une matrice
- * sera utile pour les calcul de bord
+ * \brief      Adds padding to a matrix.
  *
- * @param mat une matrice carré
-*/
+ * \param[in]  m     A square matrix
+ *
+ * \return     The matrix with padding.
+ */
 arma::mat Solver::padded(const arma::mat m)
 {
     arma::mat res(m.n_rows + 2, m.n_cols + 2, arma::fill::zeros);
@@ -86,8 +111,8 @@ arma::mat Solver::padded(const arma::mat m)
 }
 
 /**
- * calcul la valeur de psi(t+dt) avec le schéma de calcul FTCS (forward)
-*/
+ * \brief      FTCS compute scheme.
+ */
 void Solver::ftcs(void)
 {
     double const_dx = h_bar / (2 * m * dx * dx);
@@ -107,11 +132,17 @@ void Solver::ftcs(void)
     ipart = nipart;
 }
 
+/**
+ * \brief      BTCS compute scheme.
+ */
 void Solver::btcs(void)
 {
     /* TODO */
 }
 
+/**
+ * \brief      CTCS compute scheme.
+ */
 void Solver::ctcs(void)
 {
     /* TODO */
